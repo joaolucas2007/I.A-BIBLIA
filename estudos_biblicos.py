@@ -170,6 +170,49 @@ st.markdown(
         color: #34473b;
         margin: .8rem 0 1rem 0;
     }
+    /* Campos de formulário: fundo claro e texto escuro, inclusive após digitar */
+    .stApp [data-baseweb="input"] > div,
+    .stApp [data-baseweb="textarea"] > div,
+    .stApp [data-baseweb="select"] > div,
+    .stApp [data-testid="stNumberInput"] [data-baseweb="input"] > div {
+        background-color: #fffdf8 !important;
+        border-color: #d8d2c6 !important;
+    }
+    .stApp input,
+    .stApp textarea,
+    .stApp [data-baseweb="select"] input,
+    .stApp [data-baseweb="select"] [role="combobox"],
+    .stApp [data-baseweb="select"] [data-testid="stMarkdownContainer"],
+    .stApp [data-baseweb="select"] div[role="option"],
+    .stApp [data-baseweb="select"] span {
+        color: #26352d !important;
+        -webkit-text-fill-color: #26352d !important;
+        opacity: 1 !important;
+    }
+    .stApp [data-baseweb="popover"] [role="option"],
+    .stApp [data-baseweb="menu"] [role="option"] {
+        background-color: #fffdf8 !important;
+        color: #26352d !important;
+    }
+    .stApp [data-baseweb="popover"] [role="option"]:hover,
+    .stApp [data-baseweb="menu"] [role="option"]:hover {
+        background-color: #e8eee8 !important;
+        color: #173b31 !important;
+    }
+    /* Markdown gerado pela IA: títulos, listas e parágrafos sempre legíveis */
+    [data-testid="stChatMessage"] h1,
+    [data-testid="stChatMessage"] h2,
+    [data-testid="stChatMessage"] h3,
+    [data-testid="stChatMessage"] h4,
+    [data-testid="stChatMessage"] p,
+    [data-testid="stChatMessage"] li,
+    [data-testid="stChatMessage"] strong,
+    [data-testid="stChatMessage"] em {
+        color: #26352d !important;
+        -webkit-text-fill-color: #26352d !important;
+        opacity: 1 !important;
+    }
+
     footer {visibility: hidden;}
     </style>
     """,
