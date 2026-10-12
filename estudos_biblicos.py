@@ -8,7 +8,7 @@ Instalação:
 Execução:
     streamlit run estudos_biblicos.py
 
-Use sua chave de API Groq no campo da barra lateral.
+Configure GROQ_API_KEY nos Secrets privados do Streamlit Cloud.
 Nunca publique sua chave de API no GitHub.
 """
 
@@ -78,10 +78,12 @@ st.markdown(
     }
     .section-card h3 { color: #214637; margin-top: 0; }
     .small-muted { color: #68766d; font-size: .9rem; }
-    /* Contraste geral: rótulos e textos dos controles sobre o fundo claro */
+    /* Contraste consistente em todas as abas e respostas */
     .stApp, .stApp p, .stApp li, .stApp label,
     [data-testid="stWidgetLabel"], [data-testid="stWidgetLabel"] p,
-    [data-testid="stMarkdownContainer"] p {
+    [data-testid="stMarkdownContainer"] p,
+    [data-testid="stMarkdownContainer"] li,
+    [data-testid="stMarkdownContainer"] span {
         color: #26352d;
     }
     [data-testid="stWidgetLabel"],
@@ -90,44 +92,60 @@ st.markdown(
         color: #34473b !important;
         opacity: 1 !important;
     }
-    /* Abas: cobre também os elementos internos que o Streamlit renderiza */
-    div[data-testid="stTabs"] [role="tab"],
-    div[data-testid="stTabs"] [role="tab"] *,
+
+    /* Abas: corrigir texto branco antes e depois do hover */
     div[data-testid="stTabs"] button,
-    div[data-testid="stTabs"] button * {
+    div[data-testid="stTabs"] button *,
+    div[data-testid="stTabs"] [role="tab"],
+    div[data-testid="stTabs"] [role="tab"] * {
         color: #214637 !important;
-        font-weight: 600 !important;
         opacity: 1 !important;
+        font-weight: 600 !important;
     }
-    div[data-testid="stTabs"] [role="tab']:hover,
-    div[data-testid="stTabs"] [role="tab']:hover *,
     div[data-testid="stTabs"] button:hover,
-    div[data-testid="stTabs"] button:hover * {
+    div[data-testid="stTabs"] button:hover *,
+    div[data-testid="stTabs"] [role="tab"]:hover,
+    div[data-testid="stTabs"] [role="tab"]:hover * {
         color: #102a23 !important;
     }
-    div[data-testid="stTabs"] [role="tab'][aria-selected="true"],
-    div[data-testid="stTabs"] [role="tab'][aria-selected="true"] *,
     div[data-testid="stTabs"] button[aria-selected="true"],
-    div[data-testid="stTabs"] button[aria-selected="true"] * {
+    div[data-testid="stTabs"] button[aria-selected="true"] *,
+    div[data-testid="stTabs"] [role="tab"][aria-selected="true"],
+    div[data-testid="stTabs"] [role="tab"][aria-selected="true"] * {
         color: #173b31 !important;
         font-weight: 700 !important;
     }
-    /* Campos de texto: texto digitado escuro e placeholder legível */
-    .stApp input, .stApp textarea,
-    .stApp [data-baseweb="select"] *,
-    .stApp [data-baseweb="input"] *,
-    .stApp [data-baseweb="textarea"] * {
-        color: #f7f4eb;
+
+    /* Controles claros: texto digitado escuro, placeholder cinza */
+    .stApp input,
+    .stApp textarea,
+    .stApp [data-baseweb="input"] input,
+    .stApp [data-baseweb="textarea"] textarea,
+    .stApp [data-baseweb="select"] div {
+        color: #26352d !important;
+        -webkit-text-fill-color: #26352d !important;
     }
-    .stApp input, .stApp textarea,
-    .stApp [data-baseweb="select"] > div,
-    .stApp [data-baseweb="input"] > div,
-    .stApp [data-baseweb="textarea"] > div {
-        color: #f7f4eb !important;
-    }
-    .stApp input::placeholder, .stApp textarea::placeholder {
-        color: #bfc8c2 !important;
+    .stApp input::placeholder,
+    .stApp textarea::placeholder {
+        color: #68766d !important;
+        -webkit-text-fill-color: #68766d !important;
         opacity: 1 !important;
+    }
+
+    /* Respostas do assistente: impedir títulos brancos no fundo claro */
+    [data-testid="stChatMessage"] [data-testid="stMarkdownContainer"],
+    [data-testid="stChatMessage"] [data-testid="stMarkdownContainer"] *,
+    [data-testid="stMarkdownContainer"] h1,
+    [data-testid="stMarkdownContainer"] h2,
+    [data-testid="stMarkdownContainer"] h3,
+    [data-testid="stMarkdownContainer"] h4,
+    [data-testid="stMarkdownContainer"] strong,
+    [data-testid="stMarkdownContainer"] em {
+        color: #26352d !important;
+        opacity: 1 !important;
+    }
+    [data-testid="stChatMessage"] {
+        color: #26352d !important;
     }
     .stButton > button, .stFormSubmitButton > button {
         border-radius: 12px;
@@ -442,7 +460,7 @@ with chat_tab:
     chat_input = st.chat_input("Ex.: Qual é o contexto de Filipenses 4:6–7?")
     if chat_input:
         if client is None:
-            st.warning("Insira sua chave da Groq na barra lateral para conversar com a IA.")
+            st.warning("A conexão com a IA ainda não está configurada pelo responsável pelo aplicativo.")
         else:
             st.session_state.chat_messages.append({"role": "user", "content": chat_input})
             with st.chat_message("user"):
