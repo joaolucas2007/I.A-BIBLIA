@@ -78,9 +78,24 @@ st.markdown(
     }
     .section-card h3 { color: #214637; margin-top: 0; }
     .small-muted { color: #68766d; font-size: .9rem; }
-    div[data-testid="stTabs"] button {
-        border-radius: 12px 12px 0 0;
-        font-weight: 600;
+    /* Abas: manter os títulos legíveis antes, durante e depois do hover */
+    div[data-testid="stTabs"] button,
+    div[data-testid="stTabs"] button p,
+    div[data-testid="stTabs"] button span {
+        color: #214637 !important;
+        font-weight: 600 !important;
+        opacity: 1 !important;
+    }
+    div[data-testid="stTabs"] button:hover,
+    div[data-testid="stTabs"] button:hover p,
+    div[data-testid="stTabs"] button:hover span {
+        color: #102a23 !important;
+    }
+    div[data-testid="stTabs"] button[aria-selected="true"],
+    div[data-testid="stTabs"] button[aria-selected="true"] p,
+    div[data-testid="stTabs"] button[aria-selected="true"] span {
+        color: #173b31 !important;
+        font-weight: 700 !important;
     }
     .stButton > button, .stFormSubmitButton > button {
         border-radius: 12px;
@@ -121,6 +136,16 @@ Regras:
 - Responda em português brasileiro, com linguagem acolhedora, clara e didática.
 - Diferencie o que o texto bíblico diz, o contexto histórico-literário e possíveis
   interpretações. Quando houver diferenças entre tradições cristãs, deixe isso claro.
+- Sempre que explicar uma pessoa, acontecimento, viagem, reino, carta ou passagem
+  bíblica com contexto histórico, informe também o período/data aproximada (por exemplo,
+  "por volta de 400 a.C.") e o local/região relacionado ao acontecimento, quando isso
+  for relevante para a compreensão.
+- Se a data ou o local exato não forem conhecidos, forneça uma estimativa histórica
+  razoável e identifique explicitamente como aproximada ("cerca de", "provavelmente",
+  "a localização exata é incerta"). Se nem uma estimativa confiável estiver disponível,
+  diga isso claramente em vez de inventar precisão.
+- Separe datas e locais mencionados diretamente no texto bíblico daqueles estimados
+  por estudiosos. Quando existirem hipóteses diferentes, apresente-as brevemente.
 - Não invente citações, versículos, referências ou palavras bíblicas. Se não tiver
   certeza do texto exato, informe a referência e peça que a pessoa confira em sua Bíblia.
 - Evite afirmar que existe apenas uma interpretação quando o tema é debatido.
@@ -172,13 +197,13 @@ with st.sidebar:
     st.markdown("## 📖 Luz & Palavra")
     st.markdown("Seu espaço de apoio para estudar, refletir e preparar encontros bíblicos.")
     st.markdown("---")
-    st.markdown("### 🔐 Conectar a inteligência artificial")
-    api_key = st.text_input(
-        "Chave da API Groq",
-        type="password",
-        help="Cole sua chave privada da Groq. Ela não deve ser publicada no código ou no GitHub.",
-        placeholder="gsk_...",
-    )
+    st.markdown("### 🔐 Inteligência artificial")
+    st.caption("A conexão é configurada pelo responsável pelo aplicativo.")
+    try:
+        api_key = st.secrets["GROQ_API_KEY"]
+    except Exception:
+        api_key = ""
+        st.warning("A chave GROQ_API_KEY não está configurada nos Secrets do Streamlit.")
     model = st.selectbox(
         "Modelo de IA",
         options=["openai/gpt-oss-120b", "llama-3.3-70b-versatile"],
@@ -198,7 +223,7 @@ with st.sidebar:
     st.caption("Desenvolvido em Python com Streamlit e Groq.")
 
 client = None
-if api_key.strip():
+if api_key:
     try:
         client = Groq(api_key=api_key.strip())
     except Exception as exc:
@@ -207,7 +232,7 @@ if api_key.strip():
 def ask_ai(system_prompt: str, user_prompt: str, temperature: float = 0.5) -> str:
     """Envia uma solicitação à API e retorna a resposta da IA."""
     if client is None:
-        raise RuntimeError("Insira uma chave de API Groq válida na barra lateral.")
+        raise RuntimeError("A conexão com a IA não está configurada. O responsável pelo aplicativo deve verificar os Secrets do Streamlit.")
     response = client.chat.completions.create(
         model=model,
         messages=[
@@ -291,7 +316,7 @@ with study_tab:
         if not study_topic.strip() and not bible_passage.strip():
             st.warning("Informe um tema ou uma passagem bíblica para começar.")
         elif client is None:
-            st.warning("Para usar a IA, insira sua chave da Groq na barra lateral.")
+            st.warning("A conexão com a IA não está configurada. Avise o responsável pelo aplicativo.")
         else:
             request = (
                 f"Prepare um estudo bíblico.\nTema: {study_topic or 'Não especificado'}\n"
@@ -350,7 +375,7 @@ with children_tab:
         if not kids_topic.strip():
             st.warning("Informe uma história, tema ou passagem bíblica.")
         elif client is None:
-            st.warning("Para usar a IA, insira sua chave da Groq na barra lateral.")
+            st.warning("A conexão com a IA não está configurada. Avise o responsável pelo aplicativo.")
         else:
             request = (
                 f"Crie uma atividade bíblica infantil sobre: {kids_topic}.\n"
@@ -424,7 +449,7 @@ with plan_tab:
         if not plan_goal.strip():
             st.warning("Informe um objetivo para o plano.")
         elif client is None:
-            st.warning("Insira sua chave da Groq na barra lateral.")
+            st.warning("A conexão com a IA não está configurada. Avise o responsável pelo aplicativo.")
         else:
             request = (
                 f"Monte um plano de leitura bíblica de {plan_duration} sobre: {plan_goal}.\n"
@@ -459,8 +484,8 @@ with about_tab:
     st.markdown("- Python: lógica da aplicação\n- Streamlit: interface web\n- Groq: acesso ao modelo de linguagem\n- `st.session_state`: histórico temporário da conversa")
     st.markdown("**Privacidade e segurança**")
     st.markdown(
-        "- A chave da API é digitada na interface e usada para criar o cliente da API.\n"
-        "- Não coloque sua chave diretamente no código-fonte.\n"
+        "- A chave da API é lida dos Secrets privados do Streamlit.\n"
+        "- Nunca coloque sua chave diretamente no código-fonte ou no GitHub.\n"
         "- Não compartilhe dados pessoais ou informações privadas no chat.\n"
         "- A conversa fica na sessão atual; este exemplo não implementa banco de dados nem login."
     )
